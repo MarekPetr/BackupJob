@@ -1,48 +1,54 @@
 #!/usr/bin/env python3
 
-import os, tarfile, mimetypes
+import os, tarfile, mimetypes, re
 from pathlib import Path
 
-# Gets a directory path
-# e.g. filePath /var/log/file returns /var/log dirPath
-def getDirPath(filePath):
-    path = Path(filePath)
-    dirPathTuple = path.parts[:-1] # get a tuple of a dir path
-    dirPath = os.path.join(*dirPathTuple) #join paths to string
-    return dirPath
 
-def isDuplicitArchive(futureArchivName, filePath):    
-    fileDir = getDirPath(filePath)
-    files = [f for f in os.listdir(fileDir)]
+def tardir(logDir="/var/log"):
+    if not os.path.isfile(logDir):
+        print("No " + logDir + " directory found")
+        return
 
-    #TODO rewrite to filter: filtered_numbers = [num for num in nums if num < 3]
-    #archiveFiles = [file for file in files if mimetypes.guess_type(file,strict=False)[1] == 'None']
-    print(files)
-    #print(archiveFiles)
-    #print(os.listdir(fileDir))
-    for file in files:
-        fileName = file + ".gz"
-        #if futureArchivName == fileName:
-            #print(futureArchivName + "==" + fileName)
+    archExtens = ".gz"
 
+    for dirPath, dirNames, fileNames in os.walk(logDir):
 
-# TODO: Ordinal number for fileName.gz files when the same log file appears again
-# - do not overwrite it, create new fileName[i].gz file
-def tardir():
-    dest = "test/log"
+        for file in fileNames:
+            # skip symlinks
+            if os.path.islink(os.path.join(dirPath, file)):
+                continue
 
-    for root, dirs, files in os.walk(dest):
-        for file in files:
             mime = mimetypes.guess_type(file,strict=False)
-            if str(mime[1]) == "None":
-                filePath= os.path.join(root, file)
-                futureArchivName = file + ".gz"
-                isDuplicitArchive(futureArchivName, filePath)
+            # Is not archive
+            if str(mime[1]) == "None":                
+                futArchName = file + archExtens
+                filePath= os.path.join(dirPath, file)                
+                futFileName = file
+                isSuffixNum = False
+                num = 0
+                # add number if neccessary or increment it
+                # if future archive name is already in the directory
+                firstRun = True
+                for x in range(1,10):
+                    if isSuffixNum:
+                        futFileName = re.sub(r'\d+$',str(num), futFileName)
+                    elif not firstRun:
+                        futFileName += "." + str(num)
+                        isSuffixNum = True
 
-                #with tarfile.open(filePath + ".gz", "w:gz") as tar_handle:
-                    #print(filePath)
-                    #print(fileName)
+                    futArchName = futFileName + archExtens
                     
-                    #tar_handle.add(filePath, recursive=False)
+                    if futArchName not in fileNames:
+                        break
 
-tardir()
+                    if isSuffixNum:
+                        num += 1
+                    firstRun = False
+                print(os.path.join(dirPath,futArchName))
+
+                with tarfile.open(os.path.join(dirPath,futArchName), "w:gz") as tar:
+                    tar.add(filePath, recursive=False)
+                    os.remove(filePath)
+
+#TODO delete test/log
+tardir("test/log")

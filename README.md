@@ -1,5 +1,5 @@
 # BackupJob
-A python script 'zipLogs.py' compresses files in the '/var/log' directory into a gzip file.
+A python script 'zipLogs.py' compresses files in the `/var/log` directory into a gzip file.
 
 ### How it works?
     1. The script appends an ordinal number suffix (.#) to each file it compresses
@@ -7,15 +7,16 @@ A python script 'zipLogs.py' compresses files in the '/var/log' directory into a
     3. Original files are removed to preserve space
 
 ### About
-* The script runs recursively for every subdirectory in the root directory (e.g. '/var/log')
+* The script compresses regular files in every subdirectory in the root directory (e.g. `/var/log`)
 * It suffixes a number regardless if the file already has one
 
 ### Usage
-To compress files in '/var/log' directory immediately:
+To compress files in the `/var/log` directory immediately:
 ```sh
-python3 zipLogs.py'
+python3 zipLogs.py
 ```
 ### Cron job
+To run the script periodically, use a `Cron Job`: 
 Cron job syntax:
 ┌───────────── minute (0 - 59)
 │ ┌───────────── hour (0 - 23)

@@ -16,15 +16,14 @@ To compress files in the `/var/log` directory immediately:
 $ python3 zipLogs.py
 ```
 ### Cron job
-To run the script periodically, use a `Cron Job`: 
-Cron job syntax:
+To run the script periodically, use `Cron Job` as follows:
 ```
 ┌───────────── minute (0 - 59)
 │ ┌───────────── hour (0 - 23)
 │ │ ┌───────────── day of month (1 - 31)
 │ │ │ ┌───────────── month (1 - 12)
-│ │ │ │ ┌───────────── day of week (0 - 6) (Sunday to Saturday;
-│ │ │ │ │                                       7 is also Sunday on some systems)
+│ │ │ │ ┌───────────── day of week (0 - 6) (Sunday to Saturday)
+│ │ │ │ │
 │ │ │ │ │
 │ │ │ │ │
 * * * * *  command_to_execute

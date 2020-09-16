@@ -3,13 +3,12 @@ A python script 'zipLogs.py' compresses files in the '/var/log' directory into a
 
 ### How it works?
     1. The script appends an ordinal number suffix (.#) to each file it compresses
-    2. That file is then compressed into a 'gzip' file with the same suffix
-    3. The original file is removed to preserve space
+    2. Each file is then compressed into a 'gzip' file with the same suffix and saved in the same directory 
+    3. Original files are removed to preserve space
 
 ### About
 * The script runs recursively for every subdirectory in the root directory (e.g. '/var/log')
 * It suffixes a number regardless if the file already has one
-* 
 
 ### Usage
 To compress files in '/var/log' directory immediately:

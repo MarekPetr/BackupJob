@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 def zipLogs(logDir="/var/log"):
-    '''Compress log files to Zip in their directory
+    '''Compress log files in the logDir directory tree
 
     '''
     if not os.path.isdir(logDir):
@@ -55,7 +55,7 @@ def zipLogs(logDir="/var/log"):
 
                     num += 1
 
-                # rename file to match Zipped file name
+                # rename file to match the future zipped file name
                 futFilePath = os.path.join(dirPath, futFileName)
                 if filePath != futFilePath:
                     os.replace(filePath, futFilePath) # rename file

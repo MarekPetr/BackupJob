@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import os
 import mimetypes
@@ -6,6 +7,7 @@ import re
 import gzip
 import shutil
 from pathlib import Path
+
 
 def zipLogs(logDir="/var/log"):
     '''Compress log files to Zip in their directory
@@ -27,9 +29,13 @@ def zipLogs(logDir="/var/log"):
 
             # check for regular file (not compressed)
             mime = mimetypes.guess_type(file,strict=False)
-            if str(mime[1]) == "None":
-                futZipName = file + zipExt
+            if str(mime[1]) == "None":                
+
                 filePath= os.path.join(dirPath, file)
+                if not os.path.isfile(filePath):
+                    continue
+
+                futZipName = file + zipExt
                 futFileName = file
                 isSuffixNum = False
                 num = 0

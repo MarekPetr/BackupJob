@@ -1,7 +1,7 @@
 # BackupJob
 A python script [zipLogs.py](https://github.com/MarekPetr/BackupJob/blob/master/zipLogs.py) compresses regular files in the `/var/log` directory into gzip files.
 
-### How it works?
+### How it works
     1. The script appends an ordinal number suffix (.#) to each file it compresses
     2. Each file is then compressed into a 'gzip' file with the same suffix and saved in the same directory 
     3. Original files are removed to preserve space

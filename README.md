@@ -18,6 +18,7 @@ $ python3 zipLogs.py
 ### Cron job
 To run the script periodically, use a `Cron Job`: 
 Cron job syntax:
+```
 ┌───────────── minute (0 - 59)
 │ ┌───────────── hour (0 - 23)
 │ │ ┌───────────── day of month (1 - 31)
@@ -26,7 +27,8 @@ Cron job syntax:
 │ │ │ │ │                                       7 is also Sunday on some systems)
 │ │ │ │ │
 │ │ │ │ │
-\* \* \* \* \*  command_to_execute
+* * * * *  command_to_execute
+```
 
 
 To run the script every month first edit current crontab:

@@ -13,7 +13,7 @@ A python script [zipLogs.py](https://github.com/MarekPetr/BackupJob/blob/master/
 ### Usage
 To compress files in the `/var/log` directory immediately:
 ```sh
-python3 zipLogs.py
+$ python3 zipLogs.py
 ```
 ### Cron job
 To run the script periodically, use a `Cron Job`: 
@@ -31,7 +31,7 @@ Cron job syntax:
 
 To run the script every month first edit current crontab:
 ```sh
-crontab -e
+$ crontab -e
 ```
 
 Then append the following entry:

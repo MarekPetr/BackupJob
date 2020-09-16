@@ -7,7 +7,6 @@ import gzip
 import shutil
 from pathlib import Path
 
-
 def zipLogs(logDir="/var/log"):
     '''Compress log files to Zip in their directory
 
@@ -65,5 +64,6 @@ def zipLogs(logDir="/var/log"):
                 # remove it to make space for another version
                 os.remove(filePath)
 
-#TODO delete test/log
-zipLogs("test/log")
+
+if __name__ == '__main__':
+    zipLogs()

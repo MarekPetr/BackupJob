@@ -1,64 +1,69 @@
 #!/usr/bin/env python3
 
-import os, tarfile, mimetypes, re, gzip, shutil
+import os
+import mimetypes
+import re
+import gzip
+import shutil
 from pathlib import Path
 
 
-def gzipLogs(logDir="/var/log"):
+def zipLogs(logDir="/var/log"):
+    '''Compress log files to Zip in their directory
+
+    '''
     if not os.path.isdir(logDir):
         print("No " + logDir + " directory found")
         return
 
-    archExtens = ".gz"
+    zipExt = ".gz"
 
     # Repeats for every subdirectory (dirPath)
     # So filenames can be the same in different subdirectories
     for dirPath, dirNames, fileNames in os.walk(logDir):
-
         for file in fileNames:
             # skip symlinks
             if os.path.islink(os.path.join(dirPath, file)):
                 continue
 
+            # check for regular file (not compressed)
             mime = mimetypes.guess_type(file,strict=False)
-            # Is not archive
-            if str(mime[1]) == "None":                
-                futArchName = file + archExtens
-                filePath= os.path.join(dirPath, file)                
+            if str(mime[1]) == "None":
+                futZipName = file + zipExt
+                filePath= os.path.join(dirPath, file)
                 futFileName = file
                 isSuffixNum = False
                 num = 0
                
-                firstRun = True
-                 # add number if neccessary or increment it
-                # if future archive name is already in the directory
-                while futArchName in fileNames:
+                # suffix ordinal number to files
+                # increment it if future zip name is already in the directory
+                while True:
                     if isSuffixNum:
                         futFileName = re.sub(r'\d+$',str(num), futFileName)
-                    elif not firstRun:
+                    else:
                         futFileName += "." + str(num)
                         isSuffixNum = True
 
-                    futArchName = futFileName + archExtens                    
+                    futZipName = futFileName + zipExt
+                    if futZipName not in fileNames:
+                        break
 
-                    if isSuffixNum:
-                        num += 1
-                    firstRun = False
+                    num += 1
 
-                #rename archived file if the archive will be renamed
-                futFilePath = os.path.join(dirPath, futFileName)                
+                # rename file to match Zipped file name
+                futFilePath = os.path.join(dirPath, futFileName)
                 if filePath != futFilePath:
                     os.replace(filePath, futFilePath) # rename file
                     filePath = futFilePath
 
-                #compress the file
-                futArchPath = os.path.join(dirPath, futArchName)
+                # compress the file
+                futZipPath = os.path.join(dirPath, futZipName)
                 with open(filePath, 'rb') as f_in:
-                    with gzip.open(futArchPath, 'wb') as f_out:
+                    with gzip.open(futZipPath, 'wb') as f_out:
                         shutil.copyfileobj(f_in, f_out)
 
-                #remove it to make space for another version
+                # remove it to make space for another version
                 os.remove(filePath)
 
 #TODO delete test/log
-gzipLogs("test/log")
+zipLogs("test/log")

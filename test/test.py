@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+#import zipLogs
 import os
-from ziplogs import logZipper
+from ziplogs import zip_logs
 import unittest
 from unittest import TestCase
 from testfixtures import TempDirectory
 
+
+
 zipper = logZipper()
+
 
 class SuffixNumberTest(TestCase):
     filename = 'file'
@@ -40,58 +44,25 @@ class SuffixNumberTest(TestCase):
 
 
 class ZipLogsTest(TestCase):
-    empty = b""
-
     def test_zip_file(self):
         with TempDirectory() as td:
-            td.write('file', self.empty)
+            td.write('test.log', b'some foo thing')
             zipper.zip_logs(td.path, True)
-            td.compare(['file.0.gz'])
+            td.compare(['test.log.0.gz'])
 
     def test_zip_subfolder(self):
         with TempDirectory() as td:
             td.makedir('log')
-            td.write('log/test', self.empty)
+            td.write('log/test.log', b'some foo thing')
 
             zipper.zip_logs(td.path, True)
             td.compare([
-                'log/test.0.gz'
+                'log/test.log.0.gz'
                 ], files_only=True)
 
     def test_multiple_renames(self):
         with TempDirectory() as td:
-            td.write('test', self.empty)
-            td.write('test.0.gz', self.empty)
-            td.write('test.1.gz', self.empty)
-
-            zipper.zip_logs(td.path, True)
-            td.compare([
-                'test.0.gz',
-                'test.1.gz',
-                'test.2.gz'
-                ], files_only=True)
-
-    def test_zips_in_different_folders(self):
-        with TempDirectory() as td:
-            td.write('test', self.empty)
-            td.write('log/test', self.empty)
-            zipper.zip_logs(td.path, True)
-            td.compare([
-                'test.0.gz',
-                'log/test.0.gz'
-                ], files_only=True)
-
-    def test_consecutive_zips(self):
-        with TempDirectory() as td:
-            td.write('file', self.empty)
-            zipper.zip_logs(td.path, True)
-            td.write('file', b'some foo thing')
-            zipper.zip_logs(td.path, True)
-            td.compare([
-                'file.0.gz',
-                'file.1.gz'
-                ], files_only=True)
-
+            td.write('log/test.log', b'some foo thing')
 
 if __name__ == '__main__':
     unittest.main()

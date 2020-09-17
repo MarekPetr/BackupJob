@@ -2,7 +2,7 @@
 A python script [ziplogs.py](https://github.com/MarekPetr/BackupJob/blob/master/src/ziplogs.py) compresses regular files into gzip files.
 
 ### How it works
-1. The script appends an ordinal number suffix (.#) to files
+1. The script appends an ordinal number suffix (.#) to files or uses the existing one
 2. Each file is then compressed into a `gzip` file with the same suffix and saved in the same directory
 3. Original files are removed to free up drive space
 
@@ -12,7 +12,7 @@ usage: ziplogs.py [-h] [-d LOG_DIR] [-s] [-nr]
 
 optional arguments:
   -h, --help                  show this help message and exit
-  -d LOG_DIR, --dir LOG_DIR   log files directory path
+  -d LOG_DIR, --dir LOG_DIR   directory path of log files
   -s, --stats                 print statistics to stdout
   -nr, --non_recursive        do not compress files in subdirectories
 ```

@@ -28,13 +28,13 @@ class logZipper:
             self._stats = args.stats
             self._log_dir = args.log_dir
 
-
     def _suffix_number(self, filename, filenames):
         suffix_reg = r'(?<=.)\d+$'
         is_suffix = False
         num = 0
         filename_suffix = filename
 
+        # look for existing suffix number of format .#
         match = re.search(suffix_reg, filename)
         if match != None:
             num = int(match.group(0))
@@ -129,14 +129,13 @@ class logZipper:
 
         if self._stats:
             self._print_stats(zipped_cnt)
-    
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-d', '--dir', dest='log_dir', default=DEFAULT_LOG_DIR,
-        help='log files directory path')
+        help='directory path of log files')
 
     parser.add_argument('-s', '--stats', action='store_true',
         default=False, help='print statistics to stdout')

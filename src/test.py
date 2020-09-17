@@ -51,7 +51,7 @@ class ZipLogsTest(TestCase):
     def test_zip_file(self):
         with TempDirectory() as td:
             td.write('file', self.empty)
-            zipper.run(log_dir=td.path)
+            zipper.run(td.path)
             td.compare(['file.0.gz'])
 
     def test_zip_subfolder(self):
@@ -59,7 +59,7 @@ class ZipLogsTest(TestCase):
             td.makedir('log')
             td.write('log/test', self.empty)
 
-            zipper.run(log_dir=td.path)
+            zipper.run(td.path)
             td.compare([
                 'log/test.0.gz'
                 ], files_only=True)
@@ -70,7 +70,7 @@ class ZipLogsTest(TestCase):
             td.write('test.0.gz', self.empty)
             td.write('test.1.gz', self.empty)
 
-            zipper.run(log_dir=td.path)
+            zipper.run(td.path)
             td.compare([
                 'test.0.gz',
                 'test.1.gz',
@@ -81,7 +81,7 @@ class ZipLogsTest(TestCase):
         with TempDirectory() as td:
             td.write('test', self.empty)
             td.write('log/test', self.empty)
-            zipper.run(log_dir=td.path)
+            zipper.run(td.path)
             td.compare([
                 'test.0.gz',
                 'log/test.0.gz'
@@ -90,9 +90,9 @@ class ZipLogsTest(TestCase):
     def test_consecutive_zips(self):
         with TempDirectory() as td:
             td.write('file', self.empty)
-            zipper.run(log_dir=td.path)
-            td.write('file', b'some foo thing')
-            zipper.run(log_dir=td.path)
+            zipper.run(td.path)
+            td.write('file', self.empty)
+            zipper.run(td.path)
             td.compare([
                 'file.0.gz',
                 'file.1.gz'
@@ -100,14 +100,14 @@ class ZipLogsTest(TestCase):
 
     def test_non_recursive(self):
         with TempDirectory() as td:
+            td.write('log/file', self.empty)
             td.write('file', self.empty)
-            zipper.run(log_dir=td.path)
-            td.write('file', b'some foo thing')
-            zipper.run(log_dir=td.path)
+            zipper.run(td.path, non_recursive=True)
             td.compare([
-                'file.0.gz',
-                'file.1.gz'
+                'log/file',
+                'file.0.gz'
                 ], files_only=True)
+
 
 if __name__ == '__main__':
     unittest.main()

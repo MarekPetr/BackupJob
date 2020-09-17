@@ -1,26 +1,20 @@
 # BackupJob
-A python script [ziplogs.py](https://github.com/MarekPetr/BackupJob/blob/master/ziplogs.py) compresses regular files in the `/var/log` directory into gzip files.
+A python script [ziplogs.py](https://github.com/MarekPetr/BackupJob/blob/master/src/ziplogs.py) compresses regular files into gzip files.
 
 ### How it works
-1. The script appends an ordinal number suffix (.#) to each file it compresses
-2. Each file is then compressed into a `gzip` file with the same suffix and saved in the same directory 
+1. The script appends an ordinal number suffix (.#) to files
+2. Each file is then compressed into a `gzip` file with the same suffix and saved in the same directory
 3. Original files are removed to free up drive space
 
-### About
-* The script compresses regular files in every subdirectory in the root directory (e.g. `/var/log`)
-* It suffixes a number regardless if the file already has one
-
 ### Usage
-To compress files in the `/var/log` directory immediately:
-```sh
-$ usage: ziplogs.py [-h] [-d LOG_DIR] [-s]
+```
+usage: ziplogs.py [-h] [-d LOG_DIR] [-s] [-nr]
 
 optional arguments:
-  -h, --help            show this help message and exit
-  -d LOG_DIR, --dir LOG_DIR
-                        logs root directory
-  -s, --silent
-                        Display no output
+  -h, --help                  show this help message and exit
+  -d LOG_DIR, --dir LOG_DIR   log files directory path
+  -s, --stats                 print statistics to stdout
+  -nr, --non_recursive        do not compress files in subdirectories
 ```
 
 ### Cron job
@@ -47,3 +41,5 @@ Then append the following entry:
 ```
  0 12 1 * * ziplogs.py
 ```
+
+Save and close the file.

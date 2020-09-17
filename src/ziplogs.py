@@ -14,21 +14,38 @@ DEFAULT_LOG_DIR = "/var/log"
 class logZipper:
     '''Class that compresses files using zip_logs method
        at given location (default is DEFAULT_LOG_DIR)
-       recursively - i.e. in subfolders as well.
-       Compresses files are then deleted to free up space
+       Compressed files are then deleted to free up space
     '''
     _zip_ext = ".gz"
 
+    def __init__(self, args=None):
+        if args == None:
+            self._non_recursive = False
+            self._stats = False
+            self._log_dir = DEFAULT_LOG_DIR
+        else:
+            self._non_recursive = args.non_recursive
+            self._stats = args.stats
+            self._log_dir = args.log_dir
+
+
     def _suffix_number(self, filename, filenames):
+        suffix_reg = r'(?<=.)\d+$'
         is_suffix = False
         num = 0
         filename_suffix = filename
+
+        match = re.search(suffix_reg, filename)
+        if match != None:
+            num = int(match.group(0))
+            is_suffix = True
+
         # suffix ordinal number to files
         # increment it if new zip name is already in the directory
         while True:
             if is_suffix:
                 # increment the suffix number
-                filename_suffix = re.sub(r'\d+$',str(num), filename_suffix)
+                filename_suffix = re.sub(suffix_reg, str(num), filename_suffix)
             else:
                 filename_suffix += "." + str(num)
                 is_suffix = True
@@ -69,18 +86,23 @@ class logZipper:
             print(str(zipped_cnt) + " files compressed")
 
 
-    def zip_logs(self, log_dir=DEFAULT_LOG_DIR, silent=False):
-        '''Compress log files in the log_dir directory tree
+    def run(self, log_dir=DEFAULT_LOG_DIR, stats=False, non_recursive=False):
+        '''Compress log files in the _log_dir directory tree
 
         '''
+
+        self._non_recursive = non_recursive
+        self._stats = stats
+        self._log_dir = log_dir
+
         zipped_cnt = 0
-        if not os.path.isdir(log_dir):
-            print("No directory at '" + log_dir + "' found")
+        if not os.path.isdir(self._log_dir):
+            print("No directory at '" + self._log_dir + "' found")
             return
 
         # Repeats for every subdirectory (dirpath),
         # so filenames can be the same in different subdirectories
-        for dirpath, dirnames, filenames in os.walk(log_dir):
+        for dirpath, dirnames, filenames in os.walk(self._log_dir):
             for filename in filenames:
                 filepath= os.path.join(dirpath, filename)
                 # skip symlinks
@@ -91,9 +113,9 @@ class logZipper:
                     if not os.path.isfile(filepath):
                         continue
 
-                    newFileName = self._suffix_number(filename, filenames)
+                    new_file_name = self._suffix_number(filename, filenames)
                     # rename file to match the new zipped file name
-                    new_filepath = os.path.join(dirpath, newFileName)
+                    new_filepath = os.path.join(dirpath, new_file_name)
                     new_filepath = self._rename_file(filepath, new_filepath)
 
                     # compress the file
@@ -101,7 +123,11 @@ class logZipper:
                     self._gzip_file(new_filepath, zip_path)
                     zipped_cnt += 1
 
-        if not silent:
+            if self._non_recursive:
+                break
+
+
+        if self._stats:
             self._print_stats(zipped_cnt)
     
 
@@ -110,12 +136,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '-d', '--dir', dest='log_dir', default=DEFAULT_LOG_DIR,
-        help='logs root directory')
+        help='log files directory path')
 
-    parser.add_argument('-s', '--silent', action='store_true',
-        default=False, help='Display no output')
+    parser.add_argument('-s', '--stats', action='store_true',
+        default=False, help='print statistics to stdout')
+
+    parser.add_argument('-nr', '--non_recursive', action='store_true',
+        default=False, help='do not compress files in subdirectories')
 
     args = parser.parse_args()
-
-    log_zipper = logZipper()
-    log_zipper.zip_logs(args.log_dir, args.silent)
+    logZipper(args).run()

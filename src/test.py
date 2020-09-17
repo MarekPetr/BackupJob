@@ -32,11 +32,17 @@ class SuffixNumberTest(TestCase):
         filename_suffix = zipper._suffix_number(self.filename, filenames)
         assert(filename_suffix == 'file.1')
 
-    def test_double_suffix(self):
+    def test_occupied_suffix(self):
         filename = 'file.0'
         filenames = ['file.0.gz']
         filename_suffix = zipper._suffix_number(filename, filenames)
-        assert(filename_suffix == 'file.0.0')
+        assert(filename_suffix == 'file.1')
+
+    def test_double_suffix(self):
+        filename = 'file.1.0'
+        filenames = ['file.1.0.gz']
+        filename_suffix = zipper._suffix_number(filename, filenames)
+        assert(filename_suffix == 'file.1.1')
 
 
 class ZipLogsTest(TestCase):
@@ -45,7 +51,7 @@ class ZipLogsTest(TestCase):
     def test_zip_file(self):
         with TempDirectory() as td:
             td.write('file', self.empty)
-            zipper.zip_logs(td.path, True)
+            zipper.run(log_dir=td.path)
             td.compare(['file.0.gz'])
 
     def test_zip_subfolder(self):
@@ -53,7 +59,7 @@ class ZipLogsTest(TestCase):
             td.makedir('log')
             td.write('log/test', self.empty)
 
-            zipper.zip_logs(td.path, True)
+            zipper.run(log_dir=td.path)
             td.compare([
                 'log/test.0.gz'
                 ], files_only=True)
@@ -64,7 +70,7 @@ class ZipLogsTest(TestCase):
             td.write('test.0.gz', self.empty)
             td.write('test.1.gz', self.empty)
 
-            zipper.zip_logs(td.path, True)
+            zipper.run(log_dir=td.path)
             td.compare([
                 'test.0.gz',
                 'test.1.gz',
@@ -75,7 +81,7 @@ class ZipLogsTest(TestCase):
         with TempDirectory() as td:
             td.write('test', self.empty)
             td.write('log/test', self.empty)
-            zipper.zip_logs(td.path, True)
+            zipper.run(log_dir=td.path)
             td.compare([
                 'test.0.gz',
                 'log/test.0.gz'
@@ -84,14 +90,24 @@ class ZipLogsTest(TestCase):
     def test_consecutive_zips(self):
         with TempDirectory() as td:
             td.write('file', self.empty)
-            zipper.zip_logs(td.path, True)
+            zipper.run(log_dir=td.path)
             td.write('file', b'some foo thing')
-            zipper.zip_logs(td.path, True)
+            zipper.run(log_dir=td.path)
             td.compare([
                 'file.0.gz',
                 'file.1.gz'
                 ], files_only=True)
 
+    def test_non_recursive(self):
+        with TempDirectory() as td:
+            td.write('file', self.empty)
+            zipper.run(log_dir=td.path)
+            td.write('file', b'some foo thing')
+            zipper.run(log_dir=td.path)
+            td.compare([
+                'file.0.gz',
+                'file.1.gz'
+                ], files_only=True)
 
 if __name__ == '__main__':
     unittest.main()

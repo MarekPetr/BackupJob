@@ -1,5 +1,5 @@
 # BackupJob
-A python script [ziplogs.py](https://github.com/MarekPetr/BackupJob/blob/master/src/ziplogs.py) compresses regular files into gzip files.
+A python script [gziplogs.py](https://github.com/MarekPetr/BackupJob/blob/master/src/gziplogs.py) compresses regular files into gzip files.
 
 ### How it works
 1. The script appends an ordinal number suffix (.#) to files or uses the existing one
@@ -8,7 +8,7 @@ A python script [ziplogs.py](https://github.com/MarekPetr/BackupJob/blob/master/
 
 ### Usage
 ```
-usage: ziplogs.py [-h] [-d LOG_DIR] [-s] [-nr]
+usage: gziplogs.py [-h] [-d LOG_DIR] [-s] [-nr]
 
 optional arguments:
   -h, --help                  show this help message and exit
@@ -28,18 +28,36 @@ To run the script periodically, use `Cron Job` as follows:
 │ │ │ │ │
 │ │ │ │ │
 │ │ │ │ │
-* * * * *  ziplogs.py
+* * * * *  gziplogs.py
 ```
 
 
-To run the script first day of each month at 12:00, edit current crontab:
+To run the script first day of each month at 12:00, edit the current crontab:
 ```sh
 $ crontab -e
 ```
 
 Then append the following entry:
 ```
- 0 12 1 * * ziplogs.py
+ 0 12 1 * * gziplogs.py
 ```
 
 Save and close the file.
+
+### Tests
+Tests are run by [test.py](https://github.com/MarekPetr/BackupJob/blob/master/src/test.py) script. It has a [testfixtures](https://testfixtures.readthedocs.io/en/latest/) dependency. The [src](https://github.com/MarekPetr/BackupJob/blob/master/src/) folder contains [Pipfile.lock](https://github.com/MarekPetr/BackupJob/blob/master/src/Pipfile.lock) and [Pipfile](https://github.com/MarekPetr/BackupJob/blob/master/src/Pipfile) to install the right version easily in the [pipenv](https://github.com/pypa/pipenv) environment.
+
+To run the tests, first enter the `pipenv shell` environment by:
+```sh
+$ pipenv shell
+```
+
+Then run the tests:
+```sh
+$ (src) python3 test.py
+```
+
+After testing, close the environment with `exit` command:
+```sh
+$ (src) exit
+```

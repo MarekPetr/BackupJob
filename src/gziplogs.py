@@ -27,7 +27,7 @@ def _suffix_number(filename, filenames):
        e.g. for filenames ['file', 'file.0.gz'] and filename 'file'
             Return 'file.1'
     '''
-    suffix_reg = r'(?<=.)\d+$'
+    suffix_reg = r'(?<=\.)\d+$'
     is_suffix = False
     num = 0
     filename_suffix = filename
@@ -41,13 +41,13 @@ def _suffix_number(filename, filenames):
     # suffix ordinal number to files
     # increment it if new gzip name is already in the directory
     while True:
-        if is_suffix:            
+        if is_suffix:
             gzipNameSuffix = filename_suffix + GZIP_EXT
             if gzipNameSuffix not in filenames:
                 break
             else:
                 # increment the suffix number
-                filename_suffix = re.sub(suffix_reg, str(num), filename_suffix)                
+                filename_suffix = re.sub(suffix_reg, str(num), filename_suffix)
                 num += 1
         else:
             filename_suffix += "." + str(num)
@@ -69,11 +69,17 @@ def _gzip_file(filepath, gzip_path):
     if os.path.isfile(filepath):
         os.remove(filepath)
 
-def _is_regular_file(filepath):
+def _is_compressed_file(filepath):
+    if os.path.islink(filepath):
+        return False
+    if not os.path.isfile(filepath):
+        return False
+    # guess filetype based on file extension
+    # other means have to be installed -> inconvenient
     mime = mimetypes.guess_type(filepath,strict=False)
     if str(mime[1]) == "None":
-        return True
-    return False
+        return False
+    return True
 
 def _print_stats(gzipped_cnt):
     if gzipped_cnt == 1:
@@ -94,25 +100,19 @@ def gzip_logs(log_dir=DEFAULT_LOG_DIR, stats=False, non_recursive=False):
     for dirpath, dirnames, filenames in os.walk(log_dir):
         _sort_nicely(filenames)
         for filename in filenames:
-            filepath= os.path.join(dirpath, filename)
-            # skip symlinks
-            if os.path.islink(filepath):
+            filepath= os.path.join(dirpath, filename)            
+            if _is_compressed_file(filepath):
                 continue
-            
-            if _is_regular_file(filepath):
-                if not os.path.isfile(filepath):
-                    continue
+            new_file_name = _suffix_number(filename, filenames)
+            # rename file to match the new gzipped file name
+            new_filepath = os.path.join(dirpath, new_file_name)
+            new_filepath = _rename_file(filepath, new_filepath)
 
-                new_file_name = _suffix_number(filename, filenames)
-                # rename file to match the new gzipped file name
-                new_filepath = os.path.join(dirpath, new_file_name)
-                new_filepath = _rename_file(filepath, new_filepath)
-
-                # compress the file
-                gzip_path = new_filepath + GZIP_EXT
-                _gzip_file(new_filepath, gzip_path)
-                filenames.append(new_file_name + GZIP_EXT)
-                gzipped_cnt += 1
+            # compress the file
+            gzip_path = new_filepath + GZIP_EXT
+            _gzip_file(new_filepath, gzip_path)
+            filenames.append(new_file_name + GZIP_EXT)
+            gzipped_cnt += 1
 
         if non_recursive:
             break

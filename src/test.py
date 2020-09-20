@@ -94,7 +94,8 @@ class ZipLogsTest(TestCase):
 
             gzip_logs(td.path)
             td.compare([
-                'log/test.0.gz'
+                'log/test',
+                'log/test.0.gz',
                 ], files_only=True)
 
     def test_more_files(self):
@@ -105,6 +106,9 @@ class ZipLogsTest(TestCase):
 
             gzip_logs(td.path)
             td.compare([
+                'test1',
+                'test2',
+                'test3',
                 'test1.0.gz',
                 'test2.0.gz',
                 'test3.0.gz'
@@ -113,14 +117,13 @@ class ZipLogsTest(TestCase):
     def test_more_renames(self):
         with TempDirectory() as td:
             td.write('test', self.empty)
-            td.write('test.0.gz', self.empty)
-            td.write('test.1.gz', self.empty)
-
             gzip_logs(td.path)
+            gzip_logs(td.path)
+
             td.compare([
+                'test',
                 'test.0.gz',
-                'test.1.gz',
-                'test.2.gz'
+                'test.1.gz'
                 ], files_only=True)
 
     def test_zips_in_different_folders(self):
@@ -129,6 +132,8 @@ class ZipLogsTest(TestCase):
             td.write('log/test', self.empty)
             gzip_logs(td.path)
             td.compare([
+                'test',
+                'log/test',
                 'test.0.gz',
                 'log/test.0.gz'
                 ], files_only=True)
@@ -137,9 +142,9 @@ class ZipLogsTest(TestCase):
         with TempDirectory() as td:
             td.write('file', self.empty)
             gzip_logs(td.path)
-            td.write('file', self.empty)
             gzip_logs(td.path)
             td.compare([
+                'file',
                 'file.0.gz',
                 'file.1.gz'
                 ], files_only=True)
@@ -151,6 +156,7 @@ class ZipLogsTest(TestCase):
             gzip_logs(td.path, non_recursive=True)
             td.compare([
                 'log/file',
+                'file',
                 'file.0.gz'
                 ], files_only=True)
 
@@ -158,6 +164,8 @@ class ZipLogsTest(TestCase):
         td = self.get_td_zipped_twice()
 
         td.compare([
+            'file.1',
+            'file.2',
             'file.1.gz',
             'file.2.gz',
             'file.3.gz',
@@ -191,6 +199,8 @@ class ZipLogsTest(TestCase):
             gzip_logs(td.path)
 
             td.compare([
+                'file3.1',
+                'file3.2',
                 'file3.1.gz',
                 'file3.2.gz',
                 'file3.3.gz',

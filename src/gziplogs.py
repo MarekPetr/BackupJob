@@ -60,6 +60,10 @@ def _rename_file(filepath, new_filepath):
         os.replace(filepath, new_filepath) # rename file
     return new_filepath
 
+def _create_file(filepath):
+    # 'a' - open for writing
+     open(filepath, 'a').close()
+
 def _gzip_file(filepath, gzip_path):
     with open(filepath, 'rb') as f_in:
         with gzip.open(gzip_path, 'wb') as f_out:
@@ -100,7 +104,7 @@ def gzip_logs(log_dir=DEFAULT_LOG_DIR, stats=False, non_recursive=False):
     for dirpath, dirnames, filenames in os.walk(log_dir):
         _sort_nicely(filenames)
         for filename in filenames:
-            filepath= os.path.join(dirpath, filename)            
+            filepath= os.path.join(dirpath, filename)
             if _is_compressed_file(filepath):
                 continue
             new_file_name = _suffix_number(filename, filenames)
@@ -114,12 +118,11 @@ def gzip_logs(log_dir=DEFAULT_LOG_DIR, stats=False, non_recursive=False):
             filenames.append(new_file_name + GZIP_EXT)
             gzipped_cnt += 1
 
+            _create_file(filepath)
         if non_recursive:
             break
-
     if stats:
         _print_stats(gzipped_cnt)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

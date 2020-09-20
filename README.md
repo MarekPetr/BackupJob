@@ -4,7 +4,7 @@ A python script [gziplogs.py](https://github.com/MarekPetr/BackupJob/blob/master
 ### How it works
 1. The script appends an ordinal number suffix (.#) to files or uses the existing one
 2. Each file is then compressed into a `gzip` file with the same suffix and saved in the same directory
-3. Original files are removed to free up drive space
+3. New empty log file is created
 
 ### Usage
 ```
